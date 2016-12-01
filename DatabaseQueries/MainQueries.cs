@@ -5,6 +5,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
+using System.Web.UI.WebControls;
 using ORM;
 
 namespace DatabaseQueries
@@ -157,7 +158,44 @@ namespace DatabaseQueries
 
         public static void ShowReportBySeller()
         {
-            
+            Console.WriteLine("Enter start date (dd.mm.yyyy hh:mm)");
+            string startDateStr = Console.ReadLine();
+            Console.WriteLine("Enter end date (dd.mm.yyyy hh:mm)");
+            string endDateStr = Console.ReadLine();
+            DateTime startDate, endDate;
+            if (!DateTime.TryParse(startDateStr, out startDate))
+            {
+                Console.WriteLine("Wrong date");
+                return;
+            }
+            if (!DateTime.TryParse(endDateStr, out endDate))
+            {
+                Console.WriteLine("Wrong date");
+                return;
+            }
+            using (var ctx = new ShawarmaModel())
+            {
+                var ans = ctx.Seller.Join(ctx.OrderHeader, seller => seller.SellerId,
+                        header => header.SellerId, (seller, header) => new
+                        {
+                            header.OrderHeaderId,
+                            header.OrderDate,
+                            seller.SellerId,
+                            seller.SellerName
+                        }).Where((arg) => arg.OrderDate >= startDate && arg.OrderDate <= endDate)
+                    .Join(ctx.OrderDetails, arg => arg.OrderHeaderId,
+                        details => details.OrderHeaderId,
+                        (arg, details) =>
+                                new {arg.SellerId, arg.SellerName, details.Quantity, details.Shawarma.CookingTime})
+                    .GroupBy(arg => arg.SellerId);
+                foreach (var group in ans)
+                {
+                    Console.WriteLine("Seller name: " + group.First().SellerName);
+                    foreach (var record in group)
+                        Console.WriteLine($"Quantity: {record.Quantity}, " +
+                                          $"Cooking time: {record.CookingTime}");
+                }
+            }
         }
 
         public static void AddTimeController()
