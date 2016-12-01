@@ -75,8 +75,28 @@ namespace DatabaseQueries
 
         public static bool SellShawarma(string shawarmaName)
         {
-
-            return true;
+            using (var ctx = new ShawarmaModel())
+            {
+                Shawarma shawarma = ctx.Shawarma.FirstOrDefault
+                    (sh => sh.ShawarmaName == shawarmaName);
+                if (shawarma == null)
+                    return false;
+                foreach (var recipe in shawarma.ShawarmaRecipe)
+                {
+                    if (recipe.Weight > recipe.Ingradient.TotalWeight)
+                        return false;
+                    recipe.Ingradient.TotalWeight -= recipe.Weight;
+                }
+                try
+                {
+                    ctx.SaveChanges();
+                    return true;
+                }
+                catch (DbUpdateException)
+                {
+                    return false;
+                }
+            }
         }
 
         public static bool AddRecipe
@@ -102,6 +122,47 @@ namespace DatabaseQueries
                     };
                     ctx.ShawarmaRecipe.Add(sr);
                 }
+                try
+                {
+                    ctx.SaveChanges();
+                    return true;
+                }
+                catch (DbUpdateException)
+                {
+                    return false;
+                }
+            }
+        }
+
+        public static bool AddSellingPointCategory(string name)
+        {
+            using (var ctx = new ShawarmaModel())
+            {
+                ctx.SellingPointCategory.Add(new SellingPointCategory
+                        { SellingPointCategoryName = name });
+                try
+                {
+                    ctx.SaveChanges();
+                    return true;
+                }
+                catch (DbUpdateException)
+                {
+                    return false;
+                }
+            }
+        }
+
+        public static bool AddSellingPoint(string title, string address, string categoryName)
+        {
+            using (var ctx = new ShawarmaModel())
+            {
+                SellingPoint point = new SellingPoint {ShawarmaTitle = title, Address = address};
+                SellingPointCategory category = ctx.SellingPointCategory
+                    .FirstOrDefault(c => c.SellingPointCategoryName == categoryName);
+                if (category == null)
+                    return false;
+                point.SellingPointCategoryId = category.SellingPointCategoryId;
+                ctx.SellingPoint.Add(point);
                 try
                 {
                     ctx.SaveChanges();

@@ -40,6 +40,21 @@ namespace DatabaseQueries
                     case "6":
                         ShowShawarma();
                         break;
+                    case "7":
+                        SellShawarma();
+                        break;
+                    case "8":
+                        AddSellingPointCategory();
+                        break;
+                    case "9":
+                        AddSellingPoint();
+                        break;
+                    case "10":
+                        ShowSellingPointCategories();
+                        break;
+                    case "11":
+                        ShowSellingPoints();
+                        break;
                 }
                 PrintMenu();
                 Console.WriteLine("Enter command number: ");
@@ -59,7 +74,63 @@ namespace DatabaseQueries
                               "\t4 - Show categories\n" +
                               "\t5 - Add shawarma recipe\n" +
                               "\t6 - Show shawarma\n" +
-                              "\t7 - Sell shawarma\n");
+                              "\t7 - Sell shawarma\n" +
+                              "\t8 - Add selling point category\n" +
+                              "\t9 - Add selling point\n" +
+                              "\t10 - Show selling point categories\n" +
+                              "\t11 - Show selling points\n");
+        }
+
+        public static void ShowSellingPointCategories()
+        {
+            using (var ctx = new ShawarmaModel())
+            {
+                Console.WriteLine("Categories:");
+                foreach (var category in ctx.SellingPointCategory)
+                {
+                    Console.WriteLine("\t" + category.SellingPointCategoryName);
+                }
+            }
+        }
+
+        public static void ShowSellingPoints()
+        {
+            using (var ctx = new ShawarmaModel())
+            {
+                foreach (var category in ctx.SellingPointCategory)
+                {
+                    Console.WriteLine("Category: " + category.SellingPointCategoryName);
+                    foreach (var selPoint in category.SellingPoint)
+                    {
+                        Console.WriteLine($"\tTitle: {selPoint.ShawarmaTitle}\n" +
+                                          $"\tAddress: {selPoint.Address}\n");
+                    }
+                    
+                }
+            }
+        }
+        public static void AddSellingPoint()
+        {
+            Console.WriteLine("Enter selling point address");
+            string address = Console.ReadLine();
+            Console.WriteLine("Enter selling point title");
+            string title = Console.ReadLine();
+            Console.WriteLine("Enter selling point type");
+            string category = Console.ReadLine();
+            if (DataOperations.AddSellingPoint(title, address, category))
+                Console.WriteLine("Added!");
+            else
+                Console.WriteLine("Can't add");
+        }
+
+        public static void AddSellingPointCategory()
+        {
+            Console.WriteLine("Enter selling category");
+            string category = Console.ReadLine();
+            if (DataOperations.AddSellingPointCategory(category))
+                Console.WriteLine("Added!");
+            else
+                Console.WriteLine("Can't add. Maybe already exists");
         }
 
         public static void AddShawarmaRecipe()
@@ -101,7 +172,10 @@ namespace DatabaseQueries
         {
             Console.WriteLine("Enter shawarma name:");
             string name = Console.ReadLine();
-
+            if (DataOperations.SellShawarma(name))
+                Console.WriteLine("Selled! Your earned money:)");
+            else
+                Console.WriteLine("Can't sell shaurma, maybe not enought ingradients :(");
         }
 
         public static void ShowShawarma()

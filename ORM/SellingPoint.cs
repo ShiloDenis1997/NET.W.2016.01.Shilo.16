@@ -19,13 +19,13 @@ namespace ORM
         public int SellingPointId { get; set; }
 
         [Required]
-        [StringLength(1)]
+        [StringLength(255)]
         public string Address { get; set; }
 
         public int SellingPointCategoryId { get; set; }
 
         [Required]
-        [StringLength(1)]
+        [StringLength(255)]
         public string ShawarmaTitle { get; set; }
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
