@@ -13,41 +13,40 @@ namespace DatabaseQueries
     {
         static void Main(string[] args)
         {
+            PrintMenu();
+            Console.WriteLine("Enter command number: ");
+            string ans = Console.ReadLine();
+            do
+            {
+                switch (ans)
+                {
+                    case "0":
+                        goto endWork;
+                    case "1":
+                        AddIngredient();
+                        break;
+                    case "2":
+                        AddIngredientCategory();
+                        break;
+                    case "3":
+                        ShowIngradients();
+                        break;
+                    case "4":
+                        ShowCategories();
+                        break;
+                    case "5":
+                        AddShawarmaRecipe();
+                        break;
+                    case "6":
+                        ShowShawarma();
+                        break;
+                }
                 PrintMenu();
                 Console.WriteLine("Enter command number: ");
-                string ans = Console.ReadLine();
-                do
-                {
-                    switch (ans)
-                    {
-                        case "0":
-                            goto endWork;
-                        case "1":
-                            AddIngredient();
-                            break;
-                        case "2":
-                            AddIngredientCategory();
-                            break;
-                        case "3":
-                            ShowIngradients();
-                            break;
-                        case "4":
-                            ShowCategories();
-                            break;
-                        case "5":
-                            AddShawarmaRecipe();
-                            break;
-                        case "6":
-                            ShowShawarma();
-                            break;
-                    }
-                    PrintMenu();
-                    Console.WriteLine("Enter command number: ");
-                    ans = Console.ReadLine();
-                } while (true);
-                endWork:
-                ;
-            
+                ans = Console.ReadLine();
+            } while (true);
+            endWork:
+            ;
         }
 
         public static void PrintMenu()
@@ -60,7 +59,7 @@ namespace DatabaseQueries
                               "\t4 - Show categories\n" +
                               "\t5 - Add shawarma recipe\n" +
                               "\t6 - Show shawarma\n" +
-                              "");
+                              "\t7 - Sell shawarma\n");
         }
 
         public static void AddShawarmaRecipe()
@@ -96,6 +95,13 @@ namespace DatabaseQueries
                 Console.WriteLine("Added succesfully");
             else
                 Console.WriteLine("Cannot add shawarma");
+        }
+
+        public static void SellShawarma()
+        {
+            Console.WriteLine("Enter shawarma name:");
+            string name = Console.ReadLine();
+
         }
 
         public static void ShowShawarma()

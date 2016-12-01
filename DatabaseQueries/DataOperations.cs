@@ -16,7 +16,6 @@ namespace DatabaseQueries
         /// Addes new ingradient to database or if it's already exists
         /// increase <see cref="Ingradient.TotalWeight"/> by <paramref name="weight"/>
         /// </summary>
-        /// <param name="ctx"></param>
         /// <param name="name"></param>
         /// <param name="categoryName"></param>
         /// <param name="weight"></param>
@@ -52,7 +51,6 @@ namespace DatabaseQueries
                 }
                 catch (DbUpdateException)
                 {
-                    ctx.Ingradient.Remove(ingradient);
                     return false;
                 }
             }
@@ -60,10 +58,9 @@ namespace DatabaseQueries
 
         public static bool AddIngredientCategory(string name)
         {
-            IngradientCategory ic = new IngradientCategory {CategoryName = name};
             using (var ctx = new ShawarmaModel())
             {
-                ctx.IngradientCategory.Add(ic);
+                ctx.IngradientCategory.Add(new IngradientCategory { CategoryName = name });
                 try
                 {
                     ctx.SaveChanges();
@@ -71,10 +68,15 @@ namespace DatabaseQueries
                 }
                 catch (DbUpdateException)
                 {
-                    ctx.IngradientCategory.Remove(ic);
                     return false;
                 }
             }
+        }
+
+        public static bool SellShawarma(string shawarmaName)
+        {
+
+            return true;
         }
 
         public static bool AddRecipe
@@ -89,7 +91,6 @@ namespace DatabaseQueries
                     (ingr => ingradientNames.Contains(ingr.IngradientName));
                 if (ingradients.Count() != ingradientNames.Length)
                     return false;
-                ShawarmaRecipe[] shrs = new ShawarmaRecipe[ingradientNames.Length];
                 for (int i = 0; i < ingradientNames.Length; i++)
                 {
                     ShawarmaRecipe sr = new ShawarmaRecipe
@@ -100,7 +101,6 @@ namespace DatabaseQueries
                         Weight = weights[i]
                     };
                     ctx.ShawarmaRecipe.Add(sr);
-                    shrs[i] = sr;
                 }
                 try
                 {
@@ -109,8 +109,6 @@ namespace DatabaseQueries
                 }
                 catch (DbUpdateException)
                 {
-                    ctx.ShawarmaRecipe.RemoveRange(shrs);
-                    ctx.Shawarma.Remove(shawarma);
                     return false;
                 }
             }
