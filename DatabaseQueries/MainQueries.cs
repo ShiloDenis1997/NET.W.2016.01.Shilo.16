@@ -61,6 +61,12 @@ namespace DatabaseQueries
                     case "13":
                         ShowPrices();
                         break;
+                    case "14":
+                        AddSeller();
+                        break;
+                    case "15":
+                        ShowSellers();
+                        break;
                 }
                 PrintMenu();
                 Console.WriteLine("Enter command number: ");
@@ -86,7 +92,33 @@ namespace DatabaseQueries
                               "\t10 - Show selling point categories\n" +
                               "\t11 - Show selling points\n" +
                               "\t12 - Set price\n" +
-                              "\t13 - Show prices\n");
+                              "\t13 - Show prices\n" +
+                              "\t14 - Add seller-cooker\n" +
+                              "\t15 - Show sellers\n");
+        }
+
+        public static void ShowSellers()
+        {
+            using (var ctx = new ShawarmaModel())
+            {
+                Console.WriteLine("Sellers:");
+                foreach (var seller in ctx.Seller)
+                {
+                    Console.WriteLine("\tName: " + seller.SellerName);
+                    Console.WriteLine("\tWorks in: " + seller.SellingPoint.ShawarmaTitle);
+                }
+            }
+        }
+        public static void AddSeller()
+        {
+            Console.WriteLine("Enter seller's name: ");
+            string name = Console.ReadLine();
+            Console.WriteLine("Enter selling point shawarma title: ");
+            string title = Console.ReadLine();
+            if (DataOperations.AddSeller(name, title))
+                Console.WriteLine("Added");
+            else
+                Console.WriteLine("Can't add");
         }
 
         public static void ShowPrices()
@@ -156,9 +188,9 @@ namespace DatabaseQueries
         {
             Console.WriteLine("Enter selling point address");
             string address = Console.ReadLine();
-            Console.WriteLine("Enter selling point title");
+            Console.WriteLine("Enter selling point shawarma title");
             string title = Console.ReadLine();
-            Console.WriteLine("Enter selling point type");
+            Console.WriteLine("Enter selling point category");
             string category = Console.ReadLine();
             if (DataOperations.AddSellingPoint(title, address, category))
                 Console.WriteLine("Added!");

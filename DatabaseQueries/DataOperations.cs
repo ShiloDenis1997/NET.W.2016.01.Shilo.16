@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data.Entity;
 using System.Data.Entity.Infrastructure;
 using System.Data.Entity.ModelConfiguration.Conventions;
 using System.Linq;
@@ -44,15 +45,7 @@ namespace DatabaseQueries
                         TotalWeight = weight
                     });
                 }
-                try
-                {
-                    ctx.SaveChanges();
-                    return true;
-                }
-                catch (DbUpdateException)
-                {
-                    return false;
-                }
+                return Commit(ctx);
             }
         }
 
@@ -61,15 +54,7 @@ namespace DatabaseQueries
             using (var ctx = new ShawarmaModel())
             {
                 ctx.IngradientCategory.Add(new IngradientCategory { CategoryName = name });
-                try
-                {
-                    ctx.SaveChanges();
-                    return true;
-                }
-                catch (DbUpdateException)
-                {
-                    return false;
-                }
+                return Commit(ctx);
             }
         }
 
@@ -87,15 +72,7 @@ namespace DatabaseQueries
                         return false;
                     recipe.Ingradient.TotalWeight -= recipe.Weight;
                 }
-                try
-                {
-                    ctx.SaveChanges();
-                    return true;
-                }
-                catch (DbUpdateException)
-                {
-                    return false;
-                }
+                return Commit(ctx);
             }
         }
 
@@ -122,15 +99,7 @@ namespace DatabaseQueries
                     };
                     ctx.ShawarmaRecipe.Add(sr);
                 }
-                try
-                {
-                    ctx.SaveChanges();
-                    return true;
-                }
-                catch (DbUpdateException)
-                {
-                    return false;
-                }
+                return Commit(ctx);
             }
         }
 
@@ -140,15 +109,7 @@ namespace DatabaseQueries
             {
                 ctx.SellingPointCategory.Add(new SellingPointCategory
                         { SellingPointCategoryName = name });
-                try
-                {
-                    ctx.SaveChanges();
-                    return true;
-                }
-                catch (DbUpdateException)
-                {
-                    return false;
-                }
+                return Commit(ctx);
             }
         }
 
@@ -163,15 +124,7 @@ namespace DatabaseQueries
                     return false;
                 point.SellingPointCategoryId = category.SellingPointCategoryId;
                 ctx.SellingPoint.Add(point);
-                try
-                {
-                    ctx.SaveChanges();
-                    return true;
-                }
-                catch (DbUpdateException)
-                {
-                    return false;
-                }
+                return Commit(ctx);
             }
         }
 
@@ -207,15 +160,35 @@ namespace DatabaseQueries
                     };
                     ctx.PriceController.Add(pc);
                 }
-                try
-                {
-                    ctx.SaveChanges();
-                    return true;
-                }
-                catch (DbUpdateException)
-                {
+                return Commit(ctx);
+            }
+        }
+
+        public static bool AddSeller(string name, string shawarmaTitle)
+        {
+            Seller seller = new Seller {SellerName = name};
+            using (var ctx = new ShawarmaModel())
+            {
+                SellingPoint sp = ctx.SellingPoint.FirstOrDefault
+                    (selPoint => selPoint.ShawarmaTitle == shawarmaTitle);
+                if (sp == null)
                     return false;
-                }
+                seller.SellingPointId = sp.SellingPointId;
+                ctx.Seller.Add(seller);
+                return Commit(ctx);
+            }
+        }
+
+        private static bool Commit(DbContext ctx)
+        {
+            try
+            {
+                ctx.SaveChanges();
+                return true;
+            }
+            catch (DbUpdateException)
+            {
+                return false;
             }
         }
     }
