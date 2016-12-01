@@ -55,6 +55,12 @@ namespace DatabaseQueries
                     case "11":
                         ShowSellingPoints();
                         break;
+                    case "12":
+                        AddPrice();
+                        break;
+                    case "13":
+                        ShowPrices();
+                        break;
                 }
                 PrintMenu();
                 Console.WriteLine("Enter command number: ");
@@ -78,9 +84,46 @@ namespace DatabaseQueries
                               "\t8 - Add selling point category\n" +
                               "\t9 - Add selling point\n" +
                               "\t10 - Show selling point categories\n" +
-                              "\t11 - Show selling points\n");
+                              "\t11 - Show selling points\n" +
+                              "\t12 - Set price\n" +
+                              "\t13 - Show prices\n");
         }
 
+        public static void ShowPrices()
+        {
+            using (var ctx = new ShawarmaModel())
+            {
+                foreach (var sp in ctx.SellingPoint)
+                {
+                    Console.WriteLine($"Selling point: {sp.ShawarmaTitle}");
+                    foreach (var pc in sp.PriceController)
+                        Console.WriteLine($"Shawarma name: {pc.Shawarma.ShawarmaName}\n" +
+                                          $"\tPrice: {pc.Price:C}" +
+                                          $"\tComment: {pc.Comment}");
+                }
+            }
+        }
+        public static void AddPrice()
+        {
+            Console.WriteLine("Enter shawarma name: ");
+            string shName = Console.ReadLine();
+            Console.WriteLine("Enter selling point title: ");
+            string spTitle = Console.ReadLine();
+            Console.WriteLine("Enter price: ");
+            string strPrice = Console.ReadLine();
+            decimal price;
+            if (!decimal.TryParse(strPrice, out price))
+            {
+                Console.WriteLine("Invalid price format");
+                return;
+            }
+            Console.WriteLine("Enter comment:");
+            string comment = Console.ReadLine();
+            if (DataOperations.SetNewPrice(shName, price, spTitle, comment))
+                Console.WriteLine("Setted!");
+            else
+                Console.WriteLine("Can't set this price");
+        }
         public static void ShowSellingPointCategories()
         {
             using (var ctx = new ShawarmaModel())

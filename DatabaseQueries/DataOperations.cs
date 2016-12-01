@@ -174,5 +174,49 @@ namespace DatabaseQueries
                 }
             }
         }
+
+        public static bool SetNewPrice
+            (string shawarmaName, decimal price, string sellingPointTitle, string comment)
+        {
+            using (var ctx = new ShawarmaModel())
+            {
+                Shawarma shawarma = ctx.Shawarma.FirstOrDefault
+                    (sh => sh.ShawarmaName == shawarmaName);
+                if (shawarma == null)
+                    return false;
+                SellingPoint sp = ctx.SellingPoint.FirstOrDefault
+                    (s => s.ShawarmaTitle == sellingPointTitle);
+                if (sp == null)
+                    return false;
+                PriceController pc = ctx.PriceController.FirstOrDefault
+                    (p => p.ShawarmaId == shawarma.ShawarmaId
+                          && p.SellingPointId == sp.SellingPointId);
+                if (pc != null)
+                {
+                    pc.Price = price;
+                    pc.Comment = comment;
+                }
+                else
+                {
+                    pc = new PriceController
+                    {
+                        Price = price,
+                        Comment = comment,
+                        SellingPointId = sp.SellingPointId,
+                        ShawarmaId = shawarma.ShawarmaId
+                    };
+                    ctx.PriceController.Add(pc);
+                }
+                try
+                {
+                    ctx.SaveChanges();
+                    return true;
+                }
+                catch (DbUpdateException)
+                {
+                    return false;
+                }
+            }
+        }
     }
 }
