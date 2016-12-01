@@ -13,8 +13,6 @@ namespace DatabaseQueries
     {
         static void Main(string[] args)
         {
-            using (ShawarmaModel ctx = new ShawarmaModel())
-            {
                 PrintMenu();
                 Console.WriteLine("Enter command number: ");
                 string ans = Console.ReadLine();
@@ -25,22 +23,22 @@ namespace DatabaseQueries
                         case "0":
                             goto endWork;
                         case "1":
-                            AddIngredient(ctx);
+                            AddIngredient();
                             break;
                         case "2":
-                            AddIngredientCategory(ctx);
+                            AddIngredientCategory();
                             break;
                         case "3":
-                            ShowIngradients(ctx);
+                            ShowIngradients();
                             break;
                         case "4":
-                            ShowCategories(ctx);
+                            ShowCategories();
                             break;
                         case "5":
-                            AddShawarmaRecipe(ctx);
+                            AddShawarmaRecipe();
                             break;
                         case "6":
-                            ShowShawarma(ctx);
+                            ShowShawarma();
                             break;
                     }
                     PrintMenu();
@@ -49,7 +47,7 @@ namespace DatabaseQueries
                 } while (true);
                 endWork:
                 ;
-            }
+            
         }
 
         public static void PrintMenu()
@@ -61,10 +59,11 @@ namespace DatabaseQueries
                               "\t3 - Show ingradients\n" +
                               "\t4 - Show categories\n" +
                               "\t5 - Add shawarma recipe\n" +
-                              "\t6 - Show shawarma\n");
+                              "\t6 - Show shawarma\n" +
+                              "");
         }
 
-        public static void AddShawarmaRecipe(ShawarmaModel ctx)
+        public static void AddShawarmaRecipe()
         {
             Console.WriteLine("Enter shawarma name: ");
             string name = Console.ReadLine();
@@ -93,59 +92,69 @@ namespace DatabaseQueries
                 ans = Console.ReadLine();
             }
             if (DataOperations.AddRecipe
-                (ctx, name, cookingTime, ingradients.ToArray(), weights.ToArray()))
+                (name, cookingTime, ingradients.ToArray(), weights.ToArray()))
                 Console.WriteLine("Added succesfully");
             else
                 Console.WriteLine("Cannot add shawarma");
         }
 
-        public static void ShowShawarma(ShawarmaModel ctx)
+        public static void ShowShawarma()
         {
             Console.WriteLine("Shawarma:");
-            foreach (var shawarma in ctx.Shawarma)
+
+            using (var ctx = new ShawarmaModel())
             {
-                Console.WriteLine("\t" + shawarma.ShawarmaName + ":");
-                foreach (var recipe in shawarma.ShawarmaRecipe)
+                foreach (var shawarma in ctx.Shawarma)
                 {
-                    Console.WriteLine($"\t\t{recipe.Ingradient.IngradientName} " +
-                                      $"- {recipe.Weight}g");
-                }
-            }    
+                    Console.WriteLine("\t" + shawarma.ShawarmaName + ":");
+                    foreach (var recipe in shawarma.ShawarmaRecipe)
+                    {
+                        Console.WriteLine($"\t\t{recipe.Ingradient.IngradientName} " +
+                                          $"- {recipe.Weight}g");
+                    }
+                }   
+            }  
         }
 
-        public static void AddIngredientCategory(ShawarmaModel ctx)
+        public static void AddIngredientCategory()
         {
             Console.WriteLine("Enter category name:");
             string name = Console.ReadLine();
-            if (DataOperations.AddIngredientCategory(ctx, name))
+            if (DataOperations.AddIngredientCategory(name))
                 Console.WriteLine("Added succesfully");
             else
                 Console.WriteLine("Cannot add category");
         }
 
-        public static void ShowCategories(ShawarmaModel ctx)
+        public static void ShowCategories()
         {
             Console.WriteLine("Categories:");
-            foreach (var category in ctx.IngradientCategory)
+            using (var ctx = new ShawarmaModel())
             {
-                Console.WriteLine("\t" + category.CategoryName);
-            }
-        }
-
-        public static void ShowIngradients(ShawarmaModel ctx)
-        {
-            foreach (var category in ctx.IngradientCategory)
-            {
-                Console.WriteLine("Category: " + category.CategoryName);
-                foreach (var ingr in category.Ingradient)
+                foreach (var category in ctx.IngradientCategory)
                 {
-                    Console.WriteLine($"\tName: {ingr.IngradientName}");
-                    Console.WriteLine($"\tTotal weight: {ingr.TotalWeight}\n");
+                    Console.WriteLine("\t" + category.CategoryName);
                 }
             }
         }
 
-        public static void AddIngredient(ShawarmaModel ctx)
+        public static void ShowIngradients()
+        {
+            using (var ctx = new ShawarmaModel())
+            {
+                foreach (var category in ctx.IngradientCategory)
+                {
+                    Console.WriteLine("Category: " + category.CategoryName);
+                    foreach (var ingr in category.Ingradient)
+                    {
+                        Console.WriteLine($"\tName: {ingr.IngradientName}");
+                        Console.WriteLine($"\tTotal weight: {ingr.TotalWeight}\n");
+                    }
+                }
+            }
+        }
+
+        public static void AddIngredient()
         {
             Console.WriteLine("Enter ingradient category: ");
             string categoryName = Console.ReadLine();
@@ -159,7 +168,7 @@ namespace DatabaseQueries
                 Console.WriteLine("Invalid weight");
                 return;
             }
-            if (DataOperations.AddIngredient(ctx, name, categoryName, weight))
+            if (DataOperations.AddIngredient(name, categoryName, weight))
                 Console.WriteLine("Added succesfully");
             else
             {

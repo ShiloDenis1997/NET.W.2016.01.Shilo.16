@@ -22,88 +22,97 @@ namespace DatabaseQueries
         /// <param name="weight"></param>
         /// <returns>true if succesfully added, false if not</returns>
         public static bool AddIngredient
-            (ShawarmaModel ctx, string name, string categoryName, int weight)
+            (string name, string categoryName, int weight)
         {
-            Ingradient ingradient = ctx.Ingradient
-                .FirstOrDefault(ingr => ingr.IngradientName == name);
-            if (ingradient != null)
-                ingradient.TotalWeight += weight;
-            else
+            using (var ctx = new ShawarmaModel())
             {
-                IngradientCategory category =
-                    ctx.IngradientCategory
-                        .FirstOrDefault(ingr => ingr.CategoryName == categoryName);
-                if (category == null)
-                    return false;
-                int categoryId = category.CategoryId;
-                ctx.Ingradient.Add(new Ingradient
+                Ingradient ingradient = ctx.Ingradient
+                    .FirstOrDefault(ingr => ingr.IngradientName == name);
+                if (ingradient != null)
+                    ingradient.TotalWeight += weight;
+                else
                 {
-                    CategoryId = categoryId,
-                    IngradientName = name,
-                    TotalWeight = weight
-                });
-            }
-            try
-            {
-                ctx.SaveChanges();
-                return true;
-            }
-            catch (DbUpdateException)
-            {
-                ctx.Ingradient.Remove(ingradient);
-                return false;
+                    IngradientCategory category =
+                        ctx.IngradientCategory
+                            .FirstOrDefault(ingr => ingr.CategoryName == categoryName);
+                    if (category == null)
+                        return false;
+                    int categoryId = category.CategoryId;
+                    ctx.Ingradient.Add(new Ingradient
+                    {
+                        CategoryId = categoryId,
+                        IngradientName = name,
+                        TotalWeight = weight
+                    });
+                }
+                try
+                {
+                    ctx.SaveChanges();
+                    return true;
+                }
+                catch (DbUpdateException)
+                {
+                    ctx.Ingradient.Remove(ingradient);
+                    return false;
+                }
             }
         }
 
-        public static bool AddIngredientCategory(ShawarmaModel ctx, string name)
+        public static bool AddIngredientCategory(string name)
         {
             IngradientCategory ic = new IngradientCategory {CategoryName = name};
-            ctx.IngradientCategory.Add(ic);
-            try
+            using (var ctx = new ShawarmaModel())
             {
-                ctx.SaveChanges();
-                return true;
-            }
-            catch (DbUpdateException)
-            {
-                ctx.IngradientCategory.Remove(ic);
-                return false;
+                ctx.IngradientCategory.Add(ic);
+                try
+                {
+                    ctx.SaveChanges();
+                    return true;
+                }
+                catch (DbUpdateException)
+                {
+                    ctx.IngradientCategory.Remove(ic);
+                    return false;
+                }
             }
         }
 
         public static bool AddRecipe
-            (ShawarmaModel ctx, string shawarmaName, int cookingTime, 
+            (string shawarmaName, int cookingTime, 
                 string[] ingradientNames, int[] weights)
         {
             Shawarma shawarma = new Shawarma { ShawarmaName = shawarmaName, CookingTime = cookingTime };
+            using (var ctx = new ShawarmaModel())
+            {
                 ctx.Shawarma.Add(shawarma);
-            IQueryable<Ingradient> ingradients = ctx.Ingradient.Where
-                (ingr => ingradientNames.Contains(ingr.IngradientName));
-            if (ingradients.Count() != ingradientNames.Length)
-                return false;
-            ShawarmaRecipe[] shrs = new ShawarmaRecipe[ingradientNames.Length];
-            for(int i = 0; i < ingradientNames.Length; i++)
-            {
-                ShawarmaRecipe sr = new ShawarmaRecipe
+                IQueryable<Ingradient> ingradients = ctx.Ingradient.Where
+                    (ingr => ingradientNames.Contains(ingr.IngradientName));
+                if (ingradients.Count() != ingradientNames.Length)
+                    return false;
+                ShawarmaRecipe[] shrs = new ShawarmaRecipe[ingradientNames.Length];
+                for (int i = 0; i < ingradientNames.Length; i++)
                 {
-                    IngradientId = ingradients.First
-                        (ing => ing.IngradientName == ingradientNames[i]).IngradientId,
-                    ShawarmaId = shawarma.ShawarmaId,
-                    Weight = weights[i]
-                };
-                ctx.ShawarmaRecipe.Add(sr);
-                shrs[i] = sr;
-            }
-            try
-            {
-                ctx.SaveChanges();
-                return true;
-            }
-            catch (DbUpdateException)
-            {
-                ctx.ShawarmaRecipe.RemoveRange(shrs);
-                ctx.Shawarma.Remove(shawarma);
-                return false;
+                    ShawarmaRecipe sr = new ShawarmaRecipe
+                    {
+                        IngradientId = ingradients.First
+                            (ing => ing.IngradientName == ingradientNames[i]).IngradientId,
+                        ShawarmaId = shawarma.ShawarmaId,
+                        Weight = weights[i]
+                    };
+                    ctx.ShawarmaRecipe.Add(sr);
+                    shrs[i] = sr;
+                }
+                try
+                {
+                    ctx.SaveChanges();
+                    return true;
+                }
+                catch (DbUpdateException)
+                {
+                    ctx.ShawarmaRecipe.RemoveRange(shrs);
+                    ctx.Shawarma.Remove(shawarma);
+                    return false;
+                }
             }
         }
     }
