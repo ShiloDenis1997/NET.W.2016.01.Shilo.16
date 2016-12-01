@@ -77,9 +77,9 @@ namespace DatabaseQueries
         {
             Shawarma shawarma = new Shawarma { ShawarmaName = shawarmaName, CookingTime = cookingTime };
                 ctx.Shawarma.Add(shawarma);
-            Ingradient[] ingradients = ctx.Ingradient.Where
-                (ingr => ingradientNames.Contains(ingr.IngradientName)).ToArray();
-            if (ingradients.Length == 0)
+            IQueryable<Ingradient> ingradients = ctx.Ingradient.Where
+                (ingr => ingradientNames.Contains(ingr.IngradientName));
+            if (ingradients.Count() != ingradientNames.Length)
                 return false;
             ShawarmaRecipe[] shrs = new ShawarmaRecipe[ingradientNames.Length];
             for(int i = 0; i < ingradientNames.Length; i++)
