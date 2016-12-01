@@ -67,6 +67,18 @@ namespace DatabaseQueries
                     case "15":
                         ShowSellers();
                         break;
+                    case "16":
+                        AddOrder();
+                        break;
+                    case "17":
+                        AddTimeController();
+                        break;
+                    case "18":
+                        ShowReportBySellingPoint();
+                        break;
+                    case "19":
+                        ShowReportBySeller();
+                        break;
                 }
                 PrintMenu();
                 Console.WriteLine("Enter command number: ");
@@ -94,7 +106,118 @@ namespace DatabaseQueries
                               "\t12 - Set price\n" +
                               "\t13 - Show prices\n" +
                               "\t14 - Add seller-cooker\n" +
-                              "\t15 - Show sellers\n");
+                              "\t15 - Show sellers\n" +
+                              "\t16 - Add order\n" +
+                              "\t17 - Add time controller\n" +
+                              "\t18 - Show report by sellin point\n" +
+                              "\t19 - Show report by seller\n");
+        }
+
+        public static void ShowReportBySellingPoint()
+        {
+            Console.WriteLine("Enter start date (dd.mm.yyyy hh:mm)");
+            string startDateStr = Console.ReadLine();
+            Console.WriteLine("Enter end date (dd.mm.yyyy hh:mm)");
+            string endDateStr = Console.ReadLine();
+            DateTime startDate, endDate;
+            if (!DateTime.TryParse(startDateStr, out startDate))
+            {
+                Console.WriteLine("Wrong date");
+                return;
+            }
+            if (!DateTime.TryParse(endDateStr, out endDate))
+            {
+                Console.WriteLine("Wrong date");
+                return;
+            }
+            using (var ctx = new ShawarmaModel())
+            {
+                var ans = ctx.SellingPoint.Join(ctx.Seller, point => point.SellingPointId,
+                        seller => seller.SellingPointId, (point, seller) =>
+                                new {point.ShawarmaTitle, seller.SellerId})
+                    .Join(ctx.OrderHeader, arg => arg.SellerId, header => header.SellerId,
+                        (arg, header) => new {arg.ShawarmaTitle, header.OrderDate, header.OrderDetails})
+                    .Where((arg) => arg.OrderDate >= startDate && arg.OrderDate <= endDate)
+                    .GroupBy(arg=>arg.ShawarmaTitle);
+                foreach (var report in ans)
+                {
+                    Console.WriteLine("Shawarma title: " + report.Key);
+                    foreach (var item in report)
+                    {
+                        Console.WriteLine("\tDate: " + item.OrderDate);
+                        foreach (var details in item.OrderDetails)
+                        {
+                            Console.WriteLine
+                                ($"\t\t{details.Shawarma.ShawarmaName}: {details.Quantity}");
+                        }
+                    }
+                }
+            }
+        }
+
+        public static void ShowReportBySeller()
+        {
+            
+        }
+
+        public static void AddTimeController()
+        {
+            Console.WriteLine("Enter seller name:");
+            string name = Console.ReadLine();
+            Console.WriteLine("Enter work start date (dd.mm.yyyy hh:mm)");
+            string startDateStr = Console.ReadLine();
+            Console.WriteLine("Enter work end date (dd.mm.yyyy hh:mm)");
+            string endDateStr = Console.ReadLine();
+            DateTime startDate, endDate;
+            if (!DateTime.TryParse(startDateStr, out startDate))
+            {
+                Console.WriteLine("Wrong date");
+                return;
+            }
+            if (!DateTime.TryParse(endDateStr, out endDate))
+            {
+                Console.WriteLine("Wrong date");
+                return;
+            }
+            if (endDate < startDate)
+            {
+                Console.WriteLine("End date < start date. Invalid input");
+                return;
+            }
+            if (DataOperations.AddTimeController(name, startDate, endDate))
+                Console.WriteLine("Added");
+            else
+                Console.WriteLine("Can't add");
+        }
+
+        public static void AddOrder()
+        {
+            Console.WriteLine("Enter seller name:");
+            string selName = Console.ReadLine();
+            Console.WriteLine("Enter shawarma name:");
+            string shName = Console.ReadLine();
+            Console.WriteLine("Enter quantity: ");
+            string quantityStr = Console.ReadLine();
+            int quantity;
+            if (!int.TryParse(quantityStr, out quantity))
+            {
+                Console.WriteLine("Wrong quantity");
+                return;
+            }
+            Console.WriteLine("Enter order date (dd.mm.yyyy hh:mm)");
+            string date = Console.ReadLine();
+            DateTime orderDate;
+            if (!DateTime.TryParse(date, out orderDate))
+            {
+                Console.WriteLine("Wrong date");
+                return;
+            }
+            if (DataOperations.AddOrder(shName, orderDate, selName, quantity))
+                Console.WriteLine("Added");
+            else
+            {
+                Console.WriteLine("Can't add");
+            }
         }
 
         public static void ShowSellers()

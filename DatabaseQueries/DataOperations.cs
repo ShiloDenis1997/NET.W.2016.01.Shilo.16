@@ -179,6 +179,58 @@ namespace DatabaseQueries
             }
         }
 
+        public static bool AddTimeController
+            (string sellerName, DateTime workStart, DateTime workEnd)
+        {
+            using (var ctx = new ShawarmaModel())
+            {
+                Seller seller = ctx.Seller.FirstOrDefault
+                    (sel => sel.SellerName == sellerName);
+                if (seller == null)
+                    return false;
+                ctx.TimeController.Add(new TimeController
+                {
+                    SellerId = seller.SellerId,
+                    WorkStart = workStart,
+                    WorkEnd = workEnd
+                });
+                return Commit(ctx);
+            }
+        }
+
+        public static bool AddOrder
+            (string shawarmaName, DateTime date, string sellerName, int quantity)
+        {
+            using (var ctx = new ShawarmaModel())
+            {
+                Shawarma shawarma = ctx.Shawarma.FirstOrDefault
+                    (sh => sh.ShawarmaName == shawarmaName);
+                if (shawarma == null)
+                    return false;
+                Seller seller = ctx.Seller.FirstOrDefault
+                    (sel => sel.SellerName == sellerName);
+                if (seller == null)
+                    return false;
+                OrderHeader orderHeader = ctx.OrderHeader.FirstOrDefault
+                    (oh => oh.OrderDate == date && oh.SellerId == seller.SellerId);
+                if (orderHeader == null)
+                    orderHeader = new OrderHeader
+                    {
+                        OrderDate = date,
+                        SellerId = seller.SellerId
+                    };
+                ctx.OrderHeader.Add(orderHeader);
+                OrderDetails orderDetails = new OrderDetails
+                {
+                    OrderHeaderId = orderHeader.OrderHeaderId,
+                    ShawarmaId = shawarma.ShawarmaId,
+                    Quantity = quantity
+                };
+                ctx.OrderDetails.Add(orderDetails);
+                return Commit(ctx);
+            }
+        }
+
         private static bool Commit(DbContext ctx)
         {
             try
