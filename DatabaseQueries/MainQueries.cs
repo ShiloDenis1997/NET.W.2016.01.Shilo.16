@@ -110,7 +110,7 @@ namespace DatabaseQueries
                               "\t15 - Show sellers\n" +
                               "\t16 - Add order\n" +
                               "\t17 - Add time controller\n" +
-                              "\t18 - Show report by sellin point\n" +
+                              "\t18 - Show report by selling point\n" +
                               "\t19 - Show report by seller\n");
         }
 
@@ -133,23 +133,31 @@ namespace DatabaseQueries
             }
             using (var ctx = new ShawarmaModel())
             {
-                var ans = ctx.SellingPoint.Join(ctx.Seller, point => point.SellingPointId,
-                        seller => seller.SellingPointId, (point, seller) =>
-                                new {point.ShawarmaTitle, seller.SellerId})
-                    .Join(ctx.OrderHeader, arg => arg.SellerId, header => header.SellerId,
-                        (arg, header) => new {arg.ShawarmaTitle, header.OrderDate, header.OrderDetails})
-                    .Where((arg) => arg.OrderDate >= startDate && arg.OrderDate <= endDate)
-                    .GroupBy(arg=>arg.ShawarmaTitle);
-                foreach (var report in ans)
+                foreach (var selPoint in ctx.SellingPoint)
                 {
-                    Console.WriteLine("Shawarma title: " + report.Key);
-                    foreach (var item in report)
+                    Console.WriteLine("Shawarma title: " + selPoint.ShawarmaTitle);
+                    foreach (var seller in selPoint.Seller)
                     {
-                        Console.WriteLine("\tDate: " + item.OrderDate);
-                        foreach (var details in item.OrderDetails)
+                        foreach (var orderHeader 
+                            in seller.OrderHeader.Where
+                                (oh => oh.OrderDate >= startDate && oh.OrderDate <= endDate))
                         {
-                            Console.WriteLine
-                                ($"\t\t{details.Shawarma.ShawarmaName}: {details.Quantity}");
+                            Console.WriteLine("\tDate: " + orderHeader.OrderDate);
+                            decimal earned = 0m;
+                            foreach (var detail in orderHeader.OrderDetails)
+                            {
+                                try
+                                {
+                                    earned += detail.Quantity*
+                                              detail.Shawarma.PriceController.First(
+                                                  pc => pc.SellingPointId == selPoint.SellingPointId).Price;
+                                }
+                                catch
+                                {
+                                    Console.WriteLine("Some shawarma has no cost in some selling point");
+                                }
+                            }
+                            Console.WriteLine("\t\tEarned: " + earned);
                         }
                     }
                 }
@@ -175,25 +183,23 @@ namespace DatabaseQueries
             }
             using (var ctx = new ShawarmaModel())
             {
-                var ans = ctx.Seller.Join(ctx.OrderHeader, seller => seller.SellerId,
-                        header => header.SellerId, (seller, header) => new
-                        {
-                            header.OrderHeaderId,
-                            header.OrderDate,
-                            seller.SellerId,
-                            seller.SellerName
-                        }).Where((arg) => arg.OrderDate >= startDate && arg.OrderDate <= endDate)
-                    .Join(ctx.OrderDetails, arg => arg.OrderHeaderId,
-                        details => details.OrderHeaderId,
-                        (arg, details) =>
-                                new {arg.SellerId, arg.SellerName, details.Quantity, details.Shawarma.CookingTime})
-                    .GroupBy(arg => arg.SellerId);
-                foreach (var group in ans)
+                foreach (var seller in ctx.Seller)
                 {
-                    Console.WriteLine("Seller name: " + group.First().SellerName);
-                    foreach (var record in group)
-                        Console.WriteLine($"Quantity: {record.Quantity}, " +
-                                          $"Cooking time: {record.CookingTime}");
+                    Console.WriteLine("Seller name: " + seller.SellerName);
+                    TimeSpan sumWorkTime = new TimeSpan(0);
+                    foreach (var timeController in seller.TimeController)
+                    {
+                        sumWorkTime += timeController.WorkEnd - timeController.WorkStart;
+                    }
+                    Console.WriteLine("\tWorking time: " + sumWorkTime.TotalHours + "h");
+                    int cookingTime = 0;
+                    foreach (var orderHeader in seller.OrderHeader
+                        .Where(oh => oh.OrderDate >= startDate && oh.OrderDate <= endDate))
+                        foreach (var detail in orderHeader.OrderDetails)
+                        {
+                            cookingTime += detail.Quantity*detail.Shawarma.CookingTime;
+                        }
+                    Console.WriteLine("\tCooking time: " + cookingTime + "min");
                 }
             }
         }

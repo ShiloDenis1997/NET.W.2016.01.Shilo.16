@@ -49,6 +49,11 @@ namespace DatabaseQueries
             }
         }
 
+        /// <summary>
+        /// Adds new ingradient category
+        /// </summary>
+        /// <param name="name"></param>
+        /// <returns>true if succesfully added, false if not</returns>
         public static bool AddIngredientCategory(string name)
         {
             using (var ctx = new ShawarmaModel())
@@ -58,6 +63,11 @@ namespace DatabaseQueries
             }
         }
 
+        /// <summary>
+        /// Sells one shawarma by decreasing total weight of ingradients
+        /// </summary>
+        /// <param name="shawarmaName"></param>
+        /// /// <returns>true if succesfully added, false if not</returns>
         public static bool SellShawarma(string shawarmaName)
         {
             using (var ctx = new ShawarmaModel())
@@ -76,6 +86,14 @@ namespace DatabaseQueries
             }
         }
 
+        /// <summary>
+        /// Adds new recipe of shawarma
+        /// </summary>
+        /// <param name="shawarmaName"></param>
+        /// <param name="cookingTime"></param>
+        /// <param name="ingradientNames"></param>
+        /// <param name="weights"></param>
+        /// <returns></returns>
         public static bool AddRecipe
             (string shawarmaName, int cookingTime, 
                 string[] ingradientNames, int[] weights)
@@ -103,6 +121,11 @@ namespace DatabaseQueries
             }
         }
 
+        /// <summary>
+        /// Adds selling point category to database
+        /// </summary>
+        /// <param name="name"></param>
+        /// <returns>true if succesfully added, false if not</returns>
         public static bool AddSellingPointCategory(string name)
         {
             using (var ctx = new ShawarmaModel())
@@ -113,6 +136,10 @@ namespace DatabaseQueries
             }
         }
 
+        /// <summary>
+        /// Adds selling point to database
+        /// </summary>
+        /// <returns>true if succesfully added, false if not</returns>
         public static bool AddSellingPoint(string title, string address, string categoryName)
         {
             using (var ctx = new ShawarmaModel())
@@ -128,6 +155,10 @@ namespace DatabaseQueries
             }
         }
 
+        /// <summary>
+        /// Set's or create new price for shawarma in specific <paramref name="sellingPointTitle"/>
+        /// </summary>
+        /// <returns>true if succesfully added, false if not</returns>
         public static bool SetNewPrice
             (string shawarmaName, decimal price, string sellingPointTitle, string comment)
         {
@@ -164,6 +195,12 @@ namespace DatabaseQueries
             }
         }
 
+        /// <summary>
+        /// Adds new seller to specific selling point
+        /// </summary>
+        /// <param name="name"></param>
+        /// <param name="shawarmaTitle"></param>
+        /// <returns></returns>
         public static bool AddSeller(string name, string shawarmaTitle)
         {
             Seller seller = new Seller {SellerName = name};
@@ -179,6 +216,13 @@ namespace DatabaseQueries
             }
         }
 
+        /// <summary>
+        /// Add new time controller data to database
+        /// </summary>
+        /// <param name="sellerName"></param>
+        /// <param name="workStart"></param>
+        /// <param name="workEnd"></param>
+        /// <returns></returns>
         public static bool AddTimeController
             (string sellerName, DateTime workStart, DateTime workEnd)
         {
@@ -198,6 +242,14 @@ namespace DatabaseQueries
             }
         }
 
+        /// <summary>
+        /// Adds new Order to database
+        /// </summary>
+        /// <param name="shawarmaName"></param>
+        /// <param name="date"></param>
+        /// <param name="sellerName"></param>
+        /// <param name="quantity"></param>
+        /// <returns></returns>
         public static bool AddOrder
             (string shawarmaName, DateTime date, string sellerName, int quantity)
         {
@@ -231,6 +283,11 @@ namespace DatabaseQueries
             }
         }
 
+        /// <summary>
+        /// Saves changes of <paramref name="ctx"/>
+        /// </summary>
+        /// <param name="ctx"></param>
+        /// <returns>true if successfully saved, otherwise returns false</returns>
         private static bool Commit(DbContext ctx)
         {
             try
