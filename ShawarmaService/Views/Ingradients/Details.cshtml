@@ -1,0 +1,42 @@
+﻿@model ORM.Ingradient
+
+@{
+    ViewBag.Title = "Details";
+}
+
+<h2>Details</h2>
+
+<div>
+    <h4>Ingradient</h4>
+    <hr />
+    <dl class="dl-horizontal">
+        <dt>
+            @Html.DisplayNameFor(model => model.IngradientCategory.CategoryName)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.IngradientCategory.CategoryName)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.IngradientName)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.IngradientName)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.TotalWeight)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.TotalWeight)
+        </dd>
+
+    </dl>
+</div>
+<p>
+    @Html.ActionLink("Edit", "Edit", new { id = Model.IngradientId }) |
+    @Html.ActionLink("Back to List", "Index")
+</p>

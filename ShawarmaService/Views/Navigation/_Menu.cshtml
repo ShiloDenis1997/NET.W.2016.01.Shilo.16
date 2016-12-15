@@ -1,0 +1,8 @@
+﻿@model ShawarmaService.Controllers.NavigationInfo[]
+
+@foreach (var info in Model)
+{
+    @Html.RouteLink(info.LinkName, 
+        new {controller = info.Controller, action = "Index"}, 
+        new {@class = "btn btn-block btn-default btn-lg "})
+}

@@ -1,0 +1,50 @@
+﻿@model ORM.PriceController
+
+@{
+    ViewBag.Title = "Details";
+}
+
+<h2>Details</h2>
+
+<div>
+    <h4>PriceController</h4>
+    <hr />
+    <dl class="dl-horizontal">
+        <dt>
+            @Html.DisplayNameFor(model => model.SellingPoint.Address)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.SellingPoint.Address)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.Shawarma.ShawarmaName)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.Shawarma.ShawarmaName)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.Price)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.Price)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.Comment)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.Comment)
+        </dd>
+
+    </dl>
+</div>
+<p>
+    @Html.ActionLink("Edit", "Edit", new { id = Model.PriceControllerId }) |
+    @Html.ActionLink("Back to List", "Index")
+</p>
