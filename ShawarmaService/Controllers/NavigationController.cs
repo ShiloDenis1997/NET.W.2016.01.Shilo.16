@@ -19,9 +19,10 @@ namespace ShawarmaService.Controllers
         {
             NavigationInfo[] info =
             {
+                new NavigationInfo {Controller = "Requests", LinkName = "Requests"},
                 new NavigationInfo {Controller = "Shawarmas", LinkName = "Shawarma"},
                 new NavigationInfo {Controller = "Ingradients", LinkName = "Ingradients"},
-                new NavigationInfo {Controller = "IngradientCategories", LinkName = "Ingradients"},
+                new NavigationInfo {Controller = "IngradientCategories", LinkName = "Ingradient categories"},
                 new NavigationInfo {Controller = "SellingPoints", LinkName = "Selling points"},
                 new NavigationInfo {Controller = "Sellers", LinkName = "Sellers"},
                 new NavigationInfo {Controller = "SellingPointCategories", LinkName = "Selling point categories"},

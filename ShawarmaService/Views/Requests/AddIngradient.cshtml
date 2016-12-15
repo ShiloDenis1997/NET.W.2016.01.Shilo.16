@@ -1,0 +1,29 @@
+﻿@using ORM
+@model ORM.Ingradient
+
+@{
+    ViewBag.Title = "Add ingradient";
+}
+
+<h2>Add indgredient to storage</h2>
+
+@using (Html.BeginForm())
+{
+    <div class="form-group">
+        @Html.Label("Ingradient name")
+        @Html.TextBoxFor(ingradient => ingradient.IngradientName, new {@class = "form-control"})
+    </div>
+    <div class="form-group">
+        @Html.Label("Weight")
+        @Html.TextBoxFor(ingradient => ingradient.TotalWeight, new {@class = "form-control"})
+    </div>
+    <div class="form-group">
+        @Html.Label("Category")
+        @Html.DropDownList("CategoryName", 
+                (IEnumerable<SelectListItem>)ViewBag.Categories, new {@class = "form-control"})
+    </div>
+
+    <div class="form-group">
+        <input type="submit" value="Add ingradient" class="btn btn-success"/>
+    </div>
+}

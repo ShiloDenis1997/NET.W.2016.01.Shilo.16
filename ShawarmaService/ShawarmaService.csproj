@@ -212,6 +212,10 @@
     <Content Include="Views\TimeControllers\Index.cshtml" />
     <Content Include="Views\Home\Index.cshtml" />
     <Content Include="Views\Navigation\_Menu.cshtml" />
+    <Content Include="Views\Requests\Index.cshtml" />
+    <Content Include="Views\Requests\AddIngradient.cshtml" />
+    <Content Include="Views\Requests\Success.cshtml" />
+    <Content Include="Views\Requests\Failed.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="App_Start\RouteConfig.cs" />
@@ -222,6 +226,7 @@
     <Compile Include="Controllers\OrderDetailsController.cs" />
     <Compile Include="Controllers\OrderHeadersController.cs" />
     <Compile Include="Controllers\PriceControllersController.cs" />
+    <Compile Include="Controllers\RequestsController.cs" />
     <Compile Include="Controllers\SellersController.cs" />
     <Compile Include="Controllers\SellingPointCategoriesController.cs" />
     <Compile Include="Controllers\SellingPointsController.cs" />
@@ -257,6 +262,10 @@
     <Folder Include="Models\" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\DAL\DAL.csproj">
+      <Project>{613c2265-8b0d-4478-b5f1-1e3acb62ba9a}</Project>
+      <Name>DAL</Name>
+    </ProjectReference>
     <ProjectReference Include="..\ORM\ORM.csproj">
       <Project>{80ceeea8-2a09-40cb-8e50-8ac3f94555a2}</Project>
       <Name>ORM</Name>

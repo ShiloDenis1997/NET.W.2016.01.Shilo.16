@@ -9,7 +9,7 @@ using System.Text;
 using System.Threading.Tasks;
 using ORM;
 
-namespace DatabaseQueries
+namespace DAL
 {
     public static class DataOperations
     {
